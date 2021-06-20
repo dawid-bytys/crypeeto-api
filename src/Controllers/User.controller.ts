@@ -92,10 +92,6 @@ export const authentication = async (req: Request, res: Response) => {
   // Check whether the accessToken exists
   if (!accessToken) return res.status(400).send({ message: "Unauthorized" });
 
-  res.status(200).send({
-    accessToken: accessToken,
-  });
-
   try {
     const decodedToken = jwt.verify(
       accessToken,
@@ -111,6 +107,7 @@ export const authentication = async (req: Request, res: Response) => {
 
     // Send the user their data
     res.status(200).send({
+      is_logged: true,
       username: user.username,
       email: user.email,
       profile_img: user.profile_img,
