@@ -1,25 +1,13 @@
-import mongoose from "mongoose";
 import { UserModel } from "../Models/User.model";
 import chai from "chai";
 import chaiHttp from "chai-http";
 import app from "../app";
-import config from "../config";
 import { generateEmail, generatePassword, generateUsername } from "../utils";
 
 chai.should();
 chai.use(chaiHttp);
 
-// Connect to the database
-mongoose
-  .connect(config.MONGO_DATABASE_URI || "", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .catch(err => {
-    console.log(err);
-  });
-
-// Clear the database before tests
+// Clear the database before the tests
 before(done => {
   UserModel.deleteMany({}, err => {
     if (err) console.log(err);

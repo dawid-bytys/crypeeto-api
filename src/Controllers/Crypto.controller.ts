@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import axios, { AxiosResponse } from "axios";
-import config from "../config";
 
 interface CryptoData {
   meta: {
@@ -30,7 +29,7 @@ export const getPrices = async (req: Request, res: Response) => {
 
   try {
     const { data } = await axios.get<AxiosResponse<CryptoData>>(
-      `https://api.twelvedata.com/time_series?symbol=${symbol}&exchange=${exchange}&interval=${interval}&apikey=${config.TWELVE_DATA_API_KEY}`
+      `https://api.twelvedata.com/time_series?symbol=${symbol}&exchange=${exchange}&interval=${interval}&apikey=${process.env.TWELVE_DATA_API_KEY}`
     );
 
     res.send(data);
@@ -44,7 +43,7 @@ export const getLatestPrice = async (req: Request, res: Response) => {
 
   try {
     const { data } = await axios.get<AxiosResponse<CryptoPrice>>(
-      `https://api.twelvedata.com/price?symbol=${symbol}&exchange=${exchange}&apikey=${config.TWELVE_DATA_API_KEY}`
+      `https://api.twelvedata.com/price?symbol=${symbol}&exchange=${exchange}&apikey=${process.env.TWELVE_DATA_API_KEY}`
     );
 
     res.send(data);

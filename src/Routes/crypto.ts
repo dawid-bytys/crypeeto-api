@@ -1,9 +1,10 @@
 import express from "express";
-import { getPrices, getLatestPrice } from "../Controllers/Crypto.controller";
+import { getPrices, getLatestPrice } from "../controllers/Crypto.controller";
+import { authenticateToken } from "../utils/auth";
 
 const cryptoRouter = express.Router();
 
-cryptoRouter.get("/time_series", getPrices);
-cryptoRouter.get("/price", getLatestPrice);
+cryptoRouter.get("/time_series", authenticateToken, getPrices);
+cryptoRouter.get("/price", authenticateToken, getLatestPrice);
 
 export default cryptoRouter;

@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
-import dayjs from "dayjs";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { UserModel } from "../Models/User.model";
-import { isEmailValid, isPasswordValid } from "../utils";
+import { UserModel } from "../models/User.model";
+import { registerValidation, loginValidation } from "../utils/utils";
 
 interface User {
   username: string;
@@ -12,68 +11,71 @@ interface User {
   profile_img: string;
 }
 
-export const register = (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response) => {
   const { username, password, email }: User = req.body;
 
-  if (
-    username &&
-    password &&
-    email &&
-    isEmailValid(email) &&
-    isPasswordValid(password)
-  ) {
-    UserModel.findOne(
-      { $or: [{ email: email }, { username: email }] },
-      (err: any, user: User) => {
-        if (err) res.status(503).json({ message: "Server error." });
+  // Validate provided data
+  if (registerValidation({ username, email, password }))
+    return res.status(400).send({ message: "Invalid input." });
 
-        if (user) {
-          res
-            .status(401)
-            .json({ message: "Username/e-mail is already in use." });
-        } else {
-          const encryptedPassword = bcrypt.hashSync(password, 16);
+  // Check whether an email exists in the database
+  const emailExists = await UserModel.findOne({ email: email });
+  if (emailExists)
+    return res
+      .status(400)
+      .send({ message: "Username or E-mail is already in use." }); // Prevent from easier bruteforcing
 
-          const NewUser = new UserModel({
-            username: username,
-            email: email,
-            password: encryptedPassword,
-            profile_img: "",
-          });
+  // Check whether a username exists in the database
+  const usernameExists = await UserModel.findOne({ username: username });
+  if (usernameExists)
+    return res
+      .status(400)
+      .send({ message: "Username or E-mail is already in use." }); // Prevent from easier bruteforcing
 
-          NewUser.save(err => {
-            if (err) res.status(503).json({ message: "Server error." });
+  // Encrypt provided password
+  const encryptedPassword = bcrypt.hashSync(password, 16);
 
-            res.status(200).json({ message: "Successfully registered." });
-          });
-        }
-      }
-    );
-  } else {
-    res.status(401).json({ message: "Invalid input." });
+  // Create a new model
+  const NewUser = new UserModel({
+    username: username,
+    email: email,
+    password: encryptedPassword,
+  });
+
+  // Try to save a user in the database
+  try {
+    const savedUser = await NewUser.save();
+
+    res.status(200).send(savedUser);
+  } catch (err) {
+    res.status(400).send({ message: err.toString() });
   }
 };
 
-export const login = (req: Request, res: Response) => {
-  const { username, password }: User = req.body.data;
+export const login = async (req: Request, res: Response) => {
+  const { username, password }: User = req.body;
 
-  UserModel.findOne({ username: username }, async (err: any, user: User) => {
-    if (err) res.status(503).json({ message: "Server error." });
+  // Validate provided data
+  if (loginValidation({ username, password }))
+    return res.status(400).send({ message: "Invalid input." });
 
-    if (user) {
-      const validPassword = bcrypt.compareSync(password, user.password);
+  // Check whether a username exists in the database
+  const user = await UserModel.findOne({ username: username });
+  if (!user)
+    return res.status(400).send({ message: "Invalid username or password." }); // Prevent from easier bruteforcing
 
-      if (validPassword)
-        res.send({
-          username: user.username,
-          email: user.email,
-          profile_img: user.profile_img,
-        });
-      else {
-        res.status(401).json({ message: "Invalid username or password." });
-      }
-    } else {
-      res.status(401).json({ message: "Invalid username or password." });
-    }
-  });
+  // Check whether provided password match password in the databse
+  const passwordValid = await bcrypt.compare(password, user.password);
+  if (!passwordValid)
+    return res.status(400).send({ message: "Invalid username or password." }); // Prevent from easier bruteforcing
+
+  // Generate an accessToken and assign it to the header
+  const accessToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_TOKEN_SECRET || "",
+    { expiresIn: "6h" }
+  );
+
+  // Assign an accessToken to the header and send a user their data
+  res.status(200).header("authorization", accessToken).send(user);
 };

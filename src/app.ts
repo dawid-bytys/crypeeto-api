@@ -1,12 +1,16 @@
+import * as dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({ path: path.join(__dirname + "/.env") });
+
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import router from "./Routes/index";
 import mongoose from "mongoose";
-import config from "./config";
 
 const app = express();
-const PORT = config.PORT || 3001;
+const PORT = process.env.PORT || 3001;
 
 // Server configuration
 app.use(express.json());
@@ -16,7 +20,7 @@ app.use(cors());
 
 // Connect to the database
 mongoose
-  .connect(config.MONGO_DATABASE_URI || "", {
+  .connect(process.env.MONGO_DATABASE_URI || "", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

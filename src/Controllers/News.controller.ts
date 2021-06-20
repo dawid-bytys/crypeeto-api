@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import axios, { AxiosResponse } from "axios";
-import config from "../config";
 
 interface NewsData {
   status: string;
@@ -30,7 +29,7 @@ export const getNews = async (req: Request, res: Response) => {
 
   try {
     const { data } = await axios.get<AxiosResponse<NewsData>>(
-      `https://newsapi.org/v2/everything?q=${topic}&from=${weekBackwards}&sortBy=popularity&apiKey=${config.CRYPTO_NEWS_API_KEY}`
+      `https://newsapi.org/v2/everything?q=${topic}&from=${weekBackwards}&sortBy=popularity&apiKey=${process.env.CRYPTO_NEWS_API_KEY}`
     );
 
     res.send(data);
