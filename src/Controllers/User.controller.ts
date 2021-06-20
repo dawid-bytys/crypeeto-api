@@ -96,7 +96,7 @@ export const authentication = async (req: Request, res: Response) => {
     accessToken: accessToken,
   });
 
-  /*try {
+  try {
     const decodedToken = jwt.verify(
       accessToken,
       process.env.JWT_TOKEN_SECRET || ""
@@ -117,5 +117,5 @@ export const authentication = async (req: Request, res: Response) => {
     });
   } catch (err) {
     res.status(400).send({ messsage: "Unauthorized" });
-  }*/
+  }
 };
