@@ -30,3 +30,5 @@ app.listen(PORT, () => {
     `Server has started running on port ${PORT}.`
   );
 });
+
+export default app;
