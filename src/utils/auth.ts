@@ -11,20 +11,15 @@ export const authenticateToken = (
 
   // Check whether an accessToken exists
   if (!accessToken)
-    return res.status(403).send({ message: "Access forbidden." });
+    return res.status(403).send({ message: "Access forbidden" });
 
   // Try to verify a accessToken with TOKEN_SECRET
   try {
-    const verified = jwt.verify(
-      accessToken,
-      process.env.JWT_TOKEN_SECRET || ""
-    );
-
-    res.send(verified);
+    jwt.verify(accessToken, process.env.JWT_TOKEN_SECRET || "");
 
     // Continue doing a request
     next();
   } catch (err) {
-    res.status(400).send({ message: "Invalid token." });
+    res.status(400).send({ message: "Invalid token" });
   }
 };

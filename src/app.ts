@@ -6,7 +6,7 @@ dotenv.config({ path: path.join(__dirname + "/.env") });
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import router from "./Routes/index";
+import router from "./routes/index";
 import mongoose from "mongoose";
 
 const app = express();
@@ -14,9 +14,9 @@ const PORT = process.env.PORT || 3001;
 
 // Server configuration
 app.use(express.json());
-app.use(router);
+app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
-app.use(cors());
+app.use(router);
 
 // Connect to the database
 mongoose
