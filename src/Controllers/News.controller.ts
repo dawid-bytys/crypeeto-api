@@ -23,13 +23,13 @@ export const getNews = async (req: Request, res: Response) => {
   const { topic } = req.query;
   const currentDate = new Date();
 
-  const weekBackwards = new Date(currentDate.setDate(currentDate.getDate() - 7))
+  const weekPeriod = new Date(currentDate.setDate(currentDate.getDate() - 7))
     .toISOString()
     .split("T")[0];
 
   try {
-    const { data } = await axios.get<AxiosResponse<NewsData>>(
-      `https://newsapi.org/v2/everything?q=${topic}&from=${weekBackwards}&sortBy=popularity&apiKey=${process.env.CRYPTO_NEWS_API_KEY}`
+    const { data } = await axios.get<NewsData>(
+      `https://newsapi.org/v2/everything?q=${topic}&from=${weekPeriod}&sortBy=popularity&apiKey=${process.env.CRYPTO_NEWS_API_KEY}`
     );
 
     res.send(data);

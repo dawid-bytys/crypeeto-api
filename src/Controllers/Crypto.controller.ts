@@ -28,7 +28,7 @@ export const getPrices = async (req: Request, res: Response) => {
   const { symbol, exchange, interval } = req.query;
 
   try {
-    const { data } = await axios.get<AxiosResponse<CryptoData>>(
+    const { data } = await axios.get<CryptoData>(
       `https://api.twelvedata.com/time_series?symbol=${symbol}&exchange=${exchange}&interval=${interval}&apikey=${process.env.TWELVE_DATA_API_KEY}`
     );
 
@@ -42,7 +42,7 @@ export const getLatestPrice = async (req: Request, res: Response) => {
   const { symbol, exchange } = req.query;
 
   try {
-    const { data } = await axios.get<AxiosResponse<CryptoPrice>>(
+    const { data } = await axios.get<CryptoPrice>(
       `https://api.twelvedata.com/price?symbol=${symbol}&exchange=${exchange}&apikey=${process.env.TWELVE_DATA_API_KEY}`
     );
 

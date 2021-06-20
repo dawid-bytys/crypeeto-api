@@ -76,8 +76,8 @@ export const login = async (req: Request, res: Response) => {
     { expiresIn: "6h" }
   );
 
-  // Assign the accessToken to the header and send the user their data
-  res.status(200).header("x-access-token", accessToken).send({
+  // Send user their data
+  res.status(200).send({
     username: user.username,
     email: user.email,
     profile_img: user.profile_img,
@@ -113,6 +113,6 @@ export const authentication = async (req: Request, res: Response) => {
       profile_img: user.profile_img,
     });
   } catch (err) {
-    res.status(400).send({ messsage: "Unauthorized" });
+    res.status(400).send({ message: "Unauthorized" });
   }
 };

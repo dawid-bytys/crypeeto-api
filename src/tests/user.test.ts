@@ -12,236 +12,216 @@ import {
 chai.should();
 chai.use(chaiHttp);
 
-// Clear the database before the tests
-before(done => {
-  UserModel.deleteMany({}, err => {
-    if (err) console.log(err);
-  });
-  done();
-});
-
+// Sample data
 const sampleUsername = generateUsername();
 const samplePassword = generatePassword();
 const sampleEmail = generateEmail();
 
+// Invalid data
 const invalidPassword: string = "12345";
 const invalidEmail: string = "hdhsh@hdhd@";
 
+// Combined data
 const registerCredentials = {
   username: sampleUsername,
   password: samplePassword,
   email: sampleEmail,
 };
 
-// Test the [POST] /register route
-describe("[POST] /register", () => {
-  it("it should add a new user to the database [200]", done => {
-    chai
-      .request(app)
-      .post("/register")
-      .send(registerCredentials)
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.a("object");
-        res.body.should.have
-          .property("message")
-          .eql("Successfully registered!");
-        done();
-      });
+// Get an accessToken
+const getToken = async (): Promise<string> => {
+  const { status, data } = await axios.post<{ accessToken: string }>(
+    "http://localhost:3001/login",
+    {
+      username: sampleUsername,
+      password: samplePassword,
+    }
+  );
+
+  if (status === 400) return "error";
+
+  return data.accessToken;
+};
+
+export const userTests = () => {
+  // Clear the database before the tests
+  before(async () => {
+    const removal = await UserModel.deleteMany({});
   });
 
-  it("it should return the username/email is in use [400]", done => {
-    chai
-      .request(app)
-      .post("/register")
-      .send(registerCredentials)
-      .end((err, res) => {
-        res.should.have.status(400);
-        res.body.should.be.a("object");
-        res.body.should.have
-          .property("message")
-          .eql("Username or E-mail is already in use");
-        done();
-      });
-  });
+  // Test the [POST] /register route
+  describe("[POST] /register", () => {
+    it("it should add a new user to the database [200]", async () => {
+      const response = await chai
+        .request(app)
+        .post("/register")
+        .send(registerCredentials);
 
-  it("it should return invalid input [400]", done => {
-    chai
-      .request(app)
-      .post("/register")
-      .send({})
-      .end((err, res) => {
-        res.should.have.status(400);
-        res.body.should.be.a("object");
-        res.body.should.have.property("message").eql("Invalid input");
-        done();
-      });
-  });
+      response.should.have.status(200);
+      response.body.should.be.a("object");
+      response.body.should.have
+        .property("message")
+        .eql("Successfully registered!");
+    });
 
-  it("it should return the email and password are invalid [400]", done => {
-    chai
-      .request(app)
-      .post("/register")
-      .send({
+    it("it should return username/email is in use [400]", async () => {
+      const response = await chai
+        .request(app)
+        .post("/register")
+        .send(registerCredentials);
+
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have
+        .property("message")
+        .eql("Username or E-mail is already in use");
+    });
+
+    it("it should return invalid input [400]", async () => {
+      const response = await chai.request(app).post("/register").send({});
+
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have.property("message").eql("Invalid input");
+    });
+
+    it("it should return email and password are invalid [400]", async () => {
+      const response = await chai.request(app).post("/register").send({
         username: generateUsername(),
         password: invalidPassword,
         email: invalidEmail,
-      })
-      .end((err, res) => {
-        res.should.have.status(400);
-        res.body.should.be.a("object");
-        res.body.should.have.property("message").eql("Invalid input");
-        done();
       });
-  });
 
-  it("it should return the email is invalid [400]", done => {
-    chai
-      .request(app)
-      .post("/register")
-      .send({
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have.property("message").eql("Invalid input");
+    });
+
+    it("it should return invalid email [400]", async () => {
+      const response = await chai.request(app).post("/register").send({
         username: generateUsername(),
         password: samplePassword,
         email: invalidEmail,
-      })
-      .end((err, res) => {
-        res.should.have.status(400);
-        res.body.should.be.a("object");
-        res.body.should.have.property("message").eql("Invalid input");
-        done();
       });
-  });
 
-  it("it should return the password is invalid [400]", done => {
-    chai
-      .request(app)
-      .post("/register")
-      .send({
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have.property("message").eql("Invalid input");
+    });
+
+    it("it should return invalid password [400]", async () => {
+      const response = await chai.request(app).post("/register").send({
         username: generateUsername(),
         password: invalidPassword,
         email: sampleEmail,
-      })
-      .end((err, res) => {
-        res.should.have.status(400);
-        res.body.should.be.a("object");
-        res.body.should.have.property("message").eql("Invalid input");
-        done();
       });
-  });
-});
 
-// Test the [POST] /login route
-describe("[POST] /login", () => {
-  it("should receive the message that successfully logged [200]", done => {
-    chai
-      .request(app)
-      .post("/login")
-      .send({
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have.property("message").eql("Invalid input");
+    });
+  });
+
+  // Test the [POST] /login route
+  describe("[POST] /login", () => {
+    it("it should return successfully logged [200]", async () => {
+      const response = await chai.request(app).post("/login").send({
         username: sampleUsername,
         password: samplePassword,
-      })
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.a("object");
-        res.body.should.have.keys(
-          "username",
-          "email",
-          "profile_img",
-          "accessToken"
-        );
-        done();
       });
-  });
 
-  it("should receive the message that invalid username/password [400]", done => {
-    chai
-      .request(app)
-      .post("/login")
-      .send({
-        username: "3434343",
-        password: "3434343",
-      })
-      .end((err, res) => {
-        res.should.have.status(400);
-        res.body.should.be.a("object");
-        res.body.should.have
-          .property("message")
-          .eql("Invalid username or password");
-        done();
-      });
-  });
-
-  it("should receive the message that invalid input (password expected) [400]", done => {
-    chai
-      .request(app)
-      .post("/login")
-      .send({
-        username: "3434343",
-      })
-      .end((err, res) => {
-        res.should.have.status(400);
-        res.body.should.be.a("object");
-        res.body.should.have.property("message").eql("Invalid input");
-        done();
-      });
-  });
-
-  it("should receive the message that invalid input (username expected) [400]", done => {
-    chai
-      .request(app)
-      .post("/login")
-      .send({
-        password: "3434343",
-      })
-      .end((err, res) => {
-        res.should.have.status(400);
-        res.body.should.be.a("object");
-        res.body.should.have.property("message").eql("Invalid input");
-        done();
-      });
-  });
-  it("should receive the message that invalid input (username and password expected) [400]", done => {
-    chai
-      .request(app)
-      .post("/login")
-      .send({})
-      .end((err, res) => {
-        res.should.have.status(400);
-        res.body.should.be.a("object");
-        res.body.should.have.property("message").eql("Invalid input");
-        done();
-      });
-  });
-});
-
-// Get accessToken
-const getToken = async (): Promise<string> => {
-  try {
-    const response = await axios.post("/login", {
-      username: sampleUsername,
-      password: samplePassword,
+      response.should.have.status(200);
+      response.body.should.be.a("object");
+      response.body.should.have.keys(
+        "username",
+        "email",
+        "profile_img",
+        "accessToken"
+      );
     });
 
-    return response.data.accessToken;
-  } catch (err) {
-    return err.response.data;
-  }
-};
+    it("it should return invalid username/password [400]", async () => {
+      const response = await chai.request(app).post("/login").send({
+        username: "3434343",
+        password: "3434343",
+      });
 
-// Test the [GET] /authentication route
-describe("[GET] /authentication", () => {
-  getToken().then(data => {
-    it("should receive user data", done => {
-      chai
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have
+        .property("message")
+        .eql("Invalid username or password");
+    });
+
+    it("it should return invalid input (password expected) [400]", async () => {
+      const response = await chai.request(app).post("/login").send({
+        username: "3434343",
+      });
+
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have.property("message").eql("Invalid input");
+    });
+
+    it("it should return invalid input (username expected) [400]", async () => {
+      const response = await chai.request(app).post("/login").send({
+        password: "3434343",
+      });
+
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have.property("message").eql("Invalid input");
+    });
+
+    it("it should return invalid input (username and password expected) [400]", async () => {
+      const response = await chai.request(app).post("/login").send({});
+
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have.property("message").eql("Invalid input");
+    });
+  });
+
+  // Test the [GET] /authentication route
+  describe("[GET] /authentication", () => {
+    it("it should return user data", async () => {
+      const token = await getToken();
+
+      const response = await chai
         .request(app)
         .get("/authentication")
-        .set("Authorization", `Bearer ${data}`)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a("object");
-          res.body.should.have.keys("username", "email", "profile_img");
-          done();
-        });
+        .set("Authorization", `Bearer ${token}`);
+
+      response.should.have.status(200);
+      response.body.should.be.a("object");
+      response.body.should.have.keys(
+        "is_logged",
+        "username",
+        "email",
+        "profile_img"
+      );
+    });
+
+    it("it should return unauthorized (invalid token) [400]", async () => {
+      const response = await chai
+        .request(app)
+        .get("/authentication")
+        .set("Authorization", `Bearer 12345`);
+
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have.property("message").eql("Unauthorized");
+    });
+
+    it("it should return unauthorized (no token) [400]", async () => {
+      const response = await chai
+        .request(app)
+        .get("/authentication")
+        .set("Authorization", `Bearer `);
+
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have.property("message").eql("Unauthorized");
     });
   });
-});
+};

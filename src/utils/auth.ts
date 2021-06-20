@@ -20,6 +20,6 @@ export const authenticateToken = (
     // Continue doing a request
     next();
   } catch (err) {
-    res.status(400).send({ message: "Invalid token" });
+    res.status(403).send({ message: "Access forbidden" });
   }
 };
