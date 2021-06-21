@@ -12,6 +12,11 @@ interface RegisterData extends LoginData {
   email: string | undefined;
 }
 
+// Function to create random primary key number
+export const generateKey = (): string => {
+  return crypto.randomBytes(16).toString("hex");
+};
+
 // Function which generates random username
 export const generateUsername = (): string => {
   return crypto.randomBytes(10).toString("hex");

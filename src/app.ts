@@ -19,15 +19,17 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 app.use(router);
 
-// Connect to the database
-mongoose
-  .connect(process.env.MONGO_DATABASE_URI || "", {
+// Try to connect to the database
+try {
+  mongoose.connect(process.env.MONGO_DATABASE_URI || "", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-  })
-  .catch(err => {
-    console.log(err);
   });
+
+  console.log("Successfully connected to the database!");
+} catch (err) {
+  console.log(err);
+}
 
 app.listen(PORT, () => {
   console.log(

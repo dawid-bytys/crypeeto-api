@@ -33,8 +33,10 @@ export const getNews = async (req: Request, res: Response) => {
       `https://newsapi.org/v2/everything?q=${topic}&from=${weekPeriod}&sortBy=popularity&apiKey=${process.env.CRYPTO_NEWS_API_KEY}`
     );
 
-    res.send(data);
+    res.status(200).send(data);
   } catch (err) {
-    console.log(err);
+    res
+      .status(401)
+      .send({ message: "3rd party server error, try again later" });
   }
 };

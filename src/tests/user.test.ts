@@ -189,7 +189,7 @@ export const userTests = () => {
         .get("/authentication")
         .set("Authorization", `Bearer 12345`);
 
-      response.should.have.status(400);
+      response.should.have.status(401);
       response.body.should.be.a("object");
       response.body.should.have.property("is_authorized").eql(false);
     });
@@ -200,7 +200,7 @@ export const userTests = () => {
         .get("/authentication")
         .set("Authorization", `Bearer `);
 
-      response.should.have.status(400);
+      response.should.have.status(401);
       response.body.should.be.a("object");
       response.body.should.have.property("is_authorized").eql(false);
     });

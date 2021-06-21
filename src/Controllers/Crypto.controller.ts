@@ -33,9 +33,11 @@ export const getPrices = async (req: Request, res: Response) => {
       `https://api.twelvedata.com/time_series?symbol=${symbol}&exchange=${exchange}&interval=${interval}&apikey=${process.env.TWELVE_DATA_API_KEY}`
     );
 
-    res.send(data);
+    res.status(200).send(data);
   } catch (err) {
-    console.log(err);
+    res
+      .status(401)
+      .send({ message: "3rd party server error, try again later" });
   }
 };
 
@@ -48,8 +50,10 @@ export const getLatestPrice = async (req: Request, res: Response) => {
       `https://api.twelvedata.com/price?symbol=${symbol}&exchange=${exchange}&apikey=${process.env.TWELVE_DATA_API_KEY}`
     );
 
-    res.send(data);
+    res.status(200).send(data);
   } catch (err) {
-    console.log(err);
+    res
+      .status(401)
+      .send({ message: "3rd party server error, try again later" });
   }
 };

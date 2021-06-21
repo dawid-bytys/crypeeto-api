@@ -56,7 +56,9 @@ This repository was created in order to get my front-end web app "Crypeeto" work
 ### Installation
 
 1. Get your free API Key for crypto data at [https://twelvedata.com/](https://twelvedata.com/) and for the news at [https://cryptonews-api.com/](https://cryptonews-api.com/)
+
 2. Create your own MongoDB database at [https://www.mongodb.com/](https://www.mongodb.com/)
+
 3. Clone the repository
 
 ```sh

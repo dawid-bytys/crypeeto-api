@@ -50,9 +50,9 @@ export const newsTests = () => {
         .get("/news")
         .set("Authorization", `Bearer 12345`);
 
-      response.should.have.status(403);
+      response.should.have.status(401);
       response.body.should.be.a("object");
-      response.body.should.have.property("message").eql("Access forbidden");
+      response.body.should.have.property("message").eql("Unauthorized");
     });
   });
 };

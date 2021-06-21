@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { UserModel } from "../models/User.model";
+import { WalletModel } from "../models/Wallet.model";
 import { registerValidation, loginValidation } from "../utils/utils";
 
 interface User {
@@ -32,20 +33,30 @@ export const register = async (req: Request, res: Response) => {
       .status(400)
       .send({ message: "Username or E-mail is already in use" }); // Prevent from easier bruteforcing
 
-  // Encrypt provided password
+  // Encrypt the provided password
   const encryptedPassword = bcrypt.hashSync(password, 16);
 
-  // Create a new model
+  // Create the new User model
   const NewUser = new UserModel({
     username: username,
     email: email,
     password: encryptedPassword,
-    profile_img: "user.png",
   });
 
-  // Try to save the user in the database
+  // Try to save the user and his waller in the database
   try {
     const savedUser = await NewUser.save();
+
+    // Retrieve latest registered user id
+    const user = await UserModel.findOne({ username: username });
+    if (!user) return res.status(400).send({ message: "Failed to register" });
+
+    // Create the new Wallet model for the user
+    const NewWallet = new WalletModel({
+      id_user: user._id,
+    });
+
+    const savedWallet = await NewWallet.save();
 
     res.status(200).send({ message: "Successfully registered!" });
   } catch (err) {
@@ -66,12 +77,12 @@ export const login = async (req: Request, res: Response) => {
   if (!user)
     return res.status(400).send({ message: "Invalid username or password" }); // Prevent from easier bruteforcing
 
-  // Check whether provided password match password in the databse
+  // Check whether the provided password match password in the databse
   const passwordValid = await bcrypt.compare(password, user.password);
   if (!passwordValid)
     return res.status(400).send({ message: "Invalid username or password" }); // Prevent from easier bruteforcing
 
-  // Generate an accessToken
+  // Generate the accessToken
   const accessToken = jwt.sign(
     { username: user.username },
     process.env.JWT_TOKEN_SECRET || "",
@@ -87,14 +98,14 @@ export const login = async (req: Request, res: Response) => {
   });
 };
 
-// Authentication function for front-end purposes
+// Authentication function for the front-end purposes
 export const authentication = async (req: Request, res: Response) => {
   const authHeader = req.headers["authorization"];
   const accessToken = authHeader && authHeader.split(" ")[1];
 
   // Check whether the accessToken exists
   if (!accessToken)
-    return res.status(400).send({
+    return res.status(401).send({
       is_authorized: false,
     });
 
@@ -104,12 +115,12 @@ export const authentication = async (req: Request, res: Response) => {
       process.env.JWT_TOKEN_SECRET || ""
     );
 
-    // Check whether the token expired
+    // Check whether the token has already expired
     const user = await UserModel.findOne({
       username: (decodedToken as any).username,
     });
     if (!user)
-      return res.status(400).send({
+      return res.status(401).send({
         is_authorized: false,
       });
 
@@ -118,7 +129,7 @@ export const authentication = async (req: Request, res: Response) => {
       is_authorized: true,
     });
   } catch (err) {
-    res.status(400).send({
+    res.status(401).send({
       is_authorized: false,
     });
   }

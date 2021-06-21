@@ -23,8 +23,8 @@ const UserSchema = new Schema({
   profile_img: {
     type: String,
     required: true,
-    default: "",
+    default: "user.png",
   },
 });
 
-export const UserModel = mongoose.model<User>("user", UserSchema, "users");
+export const UserModel = mongoose.model<User>("User", UserSchema, "users");
