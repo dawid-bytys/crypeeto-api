@@ -10,6 +10,7 @@ interface User {
   password: string;
 }
 
+// Register function
 export const register = async (req: Request, res: Response) => {
   const { username, password, email }: User = req.body;
 
@@ -52,6 +53,7 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
+// Login function
 export const login = async (req: Request, res: Response) => {
   const { username, password }: User = req.body;
 
@@ -85,6 +87,7 @@ export const login = async (req: Request, res: Response) => {
   });
 };
 
+// Authentication function for front-end purposes
 export const authentication = async (req: Request, res: Response) => {
   const authHeader = req.headers["authorization"];
   const accessToken = authHeader && authHeader.split(" ")[1];

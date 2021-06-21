@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 
 interface CryptoData {
   meta: {
@@ -24,6 +24,7 @@ interface CryptoPrice {
   price: string;
 }
 
+// Fetch provided cryptocurrency prices from 3rd party API
 export const getPrices = async (req: Request, res: Response) => {
   const { symbol, exchange, interval } = req.query;
 
@@ -38,6 +39,7 @@ export const getPrices = async (req: Request, res: Response) => {
   }
 };
 
+// Fetch the latest cryptocurrency price from 3rd party API
 export const getLatestPrice = async (req: Request, res: Response) => {
   const { symbol, exchange } = req.query;
 

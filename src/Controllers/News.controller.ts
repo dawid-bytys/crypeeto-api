@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 
 interface NewsData {
   status: string;
@@ -19,6 +19,7 @@ interface NewsData {
   }[];
 }
 
+// Fetch news about provided topic from 3rd party API
 export const getNews = async (req: Request, res: Response) => {
   const { topic } = req.query;
   const currentDate = new Date();

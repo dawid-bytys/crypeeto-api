@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 import path from "path";
 
+// Configure the .env file
 dotenv.config({ path: path.join(__dirname + "/.env") });
 
 import express from "express";
