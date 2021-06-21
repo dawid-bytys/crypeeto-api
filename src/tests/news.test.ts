@@ -1,5 +1,6 @@
 import axios from "axios";
 import { UserModel } from "../models/User.model";
+import { getToken } from "../utils/utils";
 import chai from "chai";
 import chaiHttp from "chai-http";
 import app from "../app";
@@ -17,21 +18,6 @@ const sampleUsername = generateUsername();
 const samplePassword = generatePassword();
 const sampleEmail = generateEmail();
 
-// Get an accessToken
-const getToken = async (): Promise<string> => {
-  const { status, data } = await axios.post<{ accessToken: string }>(
-    "http://localhost:3001/login",
-    {
-      username: sampleUsername,
-      password: samplePassword,
-    }
-  );
-
-  if (status === 400) return "error";
-
-  return data.accessToken;
-};
-
 export const newsTests = () => {
   // Clear the database before the tests and login to get the accessToken
   before(async () => {
@@ -46,7 +32,7 @@ export const newsTests = () => {
   // Test the [GET] /news route
   describe("[GET] /news", () => {
     it("it should return news data [200]", async () => {
-      const token = await getToken();
+      const token = await getToken(sampleUsername, samplePassword);
 
       const response = await chai
         .request(app)

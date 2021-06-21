@@ -1,5 +1,6 @@
 import axios from "axios";
 import { UserModel } from "../models/User.model";
+import { getToken } from "../utils/utils";
 import chai from "chai";
 import chaiHttp from "chai-http";
 import app from "../app";
@@ -26,21 +27,6 @@ const registerCredentials = {
   username: sampleUsername,
   password: samplePassword,
   email: sampleEmail,
-};
-
-// Get an accessToken
-const getToken = async (): Promise<string> => {
-  const { status, data } = await axios.post<{ accessToken: string }>(
-    "http://localhost:3001/login",
-    {
-      username: sampleUsername,
-      password: samplePassword,
-    }
-  );
-
-  if (status === 400) return "error";
-
-  return data.accessToken;
 };
 
 export const userTests = () => {
@@ -184,8 +170,8 @@ export const userTests = () => {
 
   // Test the [GET] /authentication route
   describe("[GET] /authentication", () => {
-    it("it should return user data", async () => {
-      const token = await getToken();
+    it("it should return authorization true", async () => {
+      const token = await getToken(sampleUsername, samplePassword);
 
       const response = await chai
         .request(app)
@@ -194,12 +180,7 @@ export const userTests = () => {
 
       response.should.have.status(200);
       response.body.should.be.a("object");
-      response.body.should.have.keys(
-        "is_logged",
-        "username",
-        "email",
-        "profile_img"
-      );
+      response.body.should.have.property("is_authorized").eql(true);
     });
 
     it("it should return unauthorized (invalid token) [400]", async () => {
@@ -210,7 +191,7 @@ export const userTests = () => {
 
       response.should.have.status(400);
       response.body.should.be.a("object");
-      response.body.should.have.property("message").eql("Unauthorized");
+      response.body.should.have.property("is_authorized").eql(false);
     });
 
     it("it should return unauthorized (no token) [400]", async () => {
@@ -221,7 +202,7 @@ export const userTests = () => {
 
       response.should.have.status(400);
       response.body.should.be.a("object");
-      response.body.should.have.property("message").eql("Unauthorized");
+      response.body.should.have.property("is_authorized").eql(false);
     });
   });
 };

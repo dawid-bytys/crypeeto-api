@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import RandExp from "randexp";
+import axios from "axios";
 
 // Types
 interface LoginData {
@@ -58,4 +59,22 @@ export const registerValidation = ({
 export const loginValidation = ({ username, password }: LoginData): boolean => {
   if (!username || !password) return true;
   else return false;
+};
+
+// Get an accessToken
+export const getToken = async (
+  username: string,
+  password: string
+): Promise<string> => {
+  const { status, data } = await axios.post<{ accessToken: string }>(
+    "http://localhost:3001/login",
+    {
+      username: username,
+      password: password,
+    }
+  );
+
+  if (status === 400) return "error";
+
+  return data.accessToken;
 };

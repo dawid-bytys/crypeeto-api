@@ -93,7 +93,10 @@ export const authentication = async (req: Request, res: Response) => {
   const accessToken = authHeader && authHeader.split(" ")[1];
 
   // Check whether the accessToken exists
-  if (!accessToken) return res.status(400).send({ message: "Unauthorized" });
+  if (!accessToken)
+    return res.status(400).send({
+      is_authorized: false,
+    });
 
   try {
     const decodedToken = jwt.verify(
@@ -106,16 +109,17 @@ export const authentication = async (req: Request, res: Response) => {
       username: (decodedToken as any).username,
     });
     if (!user)
-      return res.status(400).send({ message: "The token has already expired" });
+      return res.status(400).send({
+        is_authorized: false,
+      });
 
-    // Send the user their data
+    // Send authorization
     res.status(200).send({
-      is_logged: true,
-      username: user.username,
-      email: user.email,
-      profile_img: user.profile_img,
+      is_authorized: true,
     });
   } catch (err) {
-    res.status(400).send({ message: "Unauthorized" });
+    res.status(400).send({
+      is_authorized: false,
+    });
   }
 };
