@@ -58,34 +58,55 @@ This repository was created in order to get my front-end web app "Crypeeto" work
 1. Get your free API Key for crypto data at [https://twelvedata.com/](https://twelvedata.com/) and for the news at [https://cryptonews-api.com/](https://cryptonews-api.com/)
 2. Create your own MongoDB database at [https://www.mongodb.com/](https://www.mongodb.com/)
 3. Clone the repository
-   ```sh
-   git clone https://github.com/salvia-dev/crypeeto-api.git
-   ```
+
+```sh
+git clone https://github.com/salvia-dev/crypeeto-api.git
+```
+
 4. Install packages with yarn
-   ```sh
-   yarn install
-   ```
+
+```sh
+yarn install
+```
+
 5. Get into the folder
-   ```sh
-   cd crypeeto-api
-   ```
+
+```sh
+cd crypeeto-api
+```
+
 6. Create a `.env` file under the src folder
-   ```sh
-   cd src && touch .env
-   ```
+
+```sh
+cd src && touch .env
+```
+
 7. Insert your `dotenv` variables in the provided format
-   ```
-   PORT=<your_port>
-   TWELVE_DATA_API_KEY=<crypto_api_key>
-   CRYPTO_NEWS_API_KEY=<news_api_key>
-   MONGO_DATABASE_URI=<your_mongodb_uri>
-   ```
+
+```
+PORT=<your_port>
+TWELVE_DATA_API_KEY=<crypto_api_key>
+CRYPTO_NEWS_API_KEY=<news_api_key>
+MONGO_DATABASE_URI=<your_mongodb_uri>
+```
 
 <!-- USAGE EXAMPLES -->
 
 ## Usage
 
 I don't know whether it will be useful for anyone but I created that for my personal purposes.
+
+1. Start the app with
+
+```sh
+yarn start
+```
+
+2. Test the app with
+
+```sh
+yarn test
+```
 
 <!-- LICENSE -->
 
