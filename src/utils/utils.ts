@@ -33,37 +33,15 @@ export const generateEmail = (): string => {
 };
 
 // E-amil validation function
-const isEmailValid = (value: string): boolean => {
+export const isEmailValid = (value: string): boolean => {
   const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
   return emailPattern.test(value);
 };
 
 // Password validation function
-const isPasswordValid = (value: string): boolean => {
+export const isPasswordValid = (value: string): boolean => {
   const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
   return passwordPattern.test(value);
-};
-
-// Validation functions for the User controller
-export const registerValidation = ({
-  username,
-  email,
-  password,
-}: RegisterData): boolean => {
-  if (
-    !username ||
-    !password ||
-    !email ||
-    !isEmailValid(email) ||
-    !isPasswordValid(password)
-  ) {
-    return true;
-  } else return false;
-};
-
-export const loginValidation = ({ username, password }: LoginData): boolean => {
-  if (!username || !password) return true;
-  else return false;
 };
 
 // Get an accessToken

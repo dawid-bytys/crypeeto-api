@@ -1,41 +1,27 @@
 import mongoose, { Schema } from "mongoose";
 
 interface Wallet {
-  id_user: mongoose.Types.ObjectId;
-  Bitcoin: number;
-  Ethereum: number;
-  Ripple: number;
-  Tether: number;
-  Stellar: number;
+  user_id: mongoose.Types.ObjectId;
+  currency: string;
+  abbreviation: string;
+  amount: number;
 }
 
 const WalletSchema = new Schema<Wallet>({
-  id_user: {
+  user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  Bitcoin: {
-    type: Number,
+  currency: {
+    type: String,
     required: true,
-    default: 0,
   },
-  Ethereum: {
-    type: Number,
+  abbreviation: {
+    type: String,
     required: true,
-    default: 0,
   },
-  Ripple: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  Tether: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  Stellar: {
+  amount: {
     type: Number,
     required: true,
     default: 0,

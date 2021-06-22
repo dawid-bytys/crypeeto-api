@@ -2,8 +2,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { UserModel } from "../models/User.model";
-import { WalletModel } from "../models/Wallet.model";
-import { registerValidation, loginValidation } from "../utils/utils";
+import { isPasswordValid, isEmailValid } from "../utils/utils";
 
 interface User {
   username: string;
@@ -15,9 +14,21 @@ interface User {
 export const register = async (req: Request, res: Response) => {
   const { username, password, email }: User = req.body;
 
-  // Validate provided data
-  if (registerValidation({ username, email, password }))
+  // Check whether the user has provided any data
+  if (Object.keys(req.body).length === 0)
     return res.status(400).send({ message: "Invalid input" });
+
+  // Validate provided password
+  if (!isPasswordValid(password))
+    return res
+      .status(400)
+      .send({ message: "You password doesn't match the requirements" });
+
+  // Validate provided email
+  if (!isEmailValid(email))
+    return res
+      .status(400)
+      .send({ message: "You e-mail doesn't match the requirements" });
 
   // Check whether the email exists in the database
   const emailExists = await UserModel.findOne({ email: email });
@@ -43,22 +54,11 @@ export const register = async (req: Request, res: Response) => {
     password: encryptedPassword,
   });
 
-  // Try to save the user and his wallet in the database
+  // Try to save the user in the database
   try {
     await NewUser.save();
 
-    // Retrieve id of the registered user
-    const user = await UserModel.findOne({ username: username });
-    if (!user) return res.status(400).send({ message: "Failed to register" });
-
-    // Create a new Wallet model for the user
-    const NewWallet = new WalletModel({
-      id_user: user._id,
-    });
-
-    await NewWallet.save();
-
-    res.status(200).send({ message: "Successfully registered!" });
+    res.status(200).send({ message: "Successfully registered" });
   } catch (err) {
     res.status(400).send({ message: err.toString() });
   }
@@ -68,8 +68,8 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   const { username, password }: User = req.body;
 
-  // Validate provided data
-  if (loginValidation({ username, password }))
+  // Check whether the user has provided any data
+  if (Object.keys(req.body).length === 0)
     return res.status(400).send({ message: "Invalid input" });
 
   // Check whether the username exists in the database

@@ -1,9 +1,10 @@
 import express from "express";
-import { updateWallet } from "../controllers/Wallet.controller";
+import { updateWallet, createWallet } from "../controllers/Wallet.controller";
 import { authenticateToken } from "../utils/auth";
 
 const walletRouter = express.Router();
 
-walletRouter.post("/updateWallet/:type", authenticateToken, updateWallet);
+//walletRouter.post("/wallet", authenticateToken, updateWallet);
+walletRouter.post("/wallet/create", authenticateToken, createWallet);
 
 export default walletRouter;
