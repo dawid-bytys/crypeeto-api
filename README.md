@@ -37,7 +37,7 @@
 
 ## About The Project
 
-This repository was created in order to get my front-end web app "Crypeeto" working correctly under different circumstances and to show my skills which I have acquired in the last few years. For the time being, I am trying to adapt myself to best practices and keep my code VERY VERY clean.
+This repository is being constantly developed in order to get my front-end web app "Crypeeto" working correctly under different circumstances and to show my skills which I have acquired in the last few years. For the time being, I am trying to adapt myself to best practices and keep my code VERY VERY clean.
 
 ### Built With
 
