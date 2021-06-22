@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { UserModel } from "../models/User.model";
+import { UserModel } from "../Models/User.model";
 import { isPasswordValid, isEmailValid } from "../utils/utils";
 
 interface User {
