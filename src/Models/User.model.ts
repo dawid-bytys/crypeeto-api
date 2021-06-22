@@ -7,7 +7,7 @@ interface User {
   profile_img: string;
 }
 
-const UserSchema = new Schema({
+const UserSchema = new Schema<User>({
   username: {
     type: String,
     required: true,

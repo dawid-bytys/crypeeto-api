@@ -43,20 +43,20 @@ export const register = async (req: Request, res: Response) => {
     password: encryptedPassword,
   });
 
-  // Try to save the user and his waller in the database
+  // Try to save the user and his wallet in the database
   try {
-    const savedUser = await NewUser.save();
+    await NewUser.save();
 
-    // Retrieve latest registered user id
+    // Retrieve id of the registered user
     const user = await UserModel.findOne({ username: username });
     if (!user) return res.status(400).send({ message: "Failed to register" });
 
-    // Create the new Wallet model for the user
+    // Create a new Wallet model for the user
     const NewWallet = new WalletModel({
       id_user: user._id,
     });
 
-    const savedWallet = await NewWallet.save();
+    await NewWallet.save();
 
     res.status(200).send({ message: "Successfully registered!" });
   } catch (err) {
@@ -84,7 +84,7 @@ export const login = async (req: Request, res: Response) => {
 
   // Generate the accessToken
   const accessToken = jwt.sign(
-    { username: user.username },
+    { _id: user._id },
     process.env.JWT_TOKEN_SECRET || "",
     { expiresIn: "6h" }
   );
@@ -110,6 +110,7 @@ export const authentication = async (req: Request, res: Response) => {
     });
 
   try {
+    // Decode the token
     const decodedToken = jwt.verify(
       accessToken,
       process.env.JWT_TOKEN_SECRET || ""
@@ -117,7 +118,7 @@ export const authentication = async (req: Request, res: Response) => {
 
     // Check whether the token has already expired
     const user = await UserModel.findOne({
-      username: (decodedToken as any).username,
+      _id: (decodedToken as any)._id,
     });
     if (!user)
       return res.status(401).send({

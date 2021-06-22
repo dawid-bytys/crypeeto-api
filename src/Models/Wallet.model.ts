@@ -1,15 +1,15 @@
 import mongoose, { Schema } from "mongoose";
 
 interface Wallet {
-  id_user: mongoose.Schema.Types.ObjectId;
-  Bitcoin: Number;
-  Ethereum: Number;
-  Ripple: Number;
-  Tether: Number;
-  Stellar: Number;
+  id_user: mongoose.Types.ObjectId;
+  Bitcoin: number;
+  Ethereum: number;
+  Ripple: number;
+  Tether: number;
+  Stellar: number;
 }
 
-const WalletSchema = new Schema({
+const WalletSchema = new Schema<Wallet>({
   id_user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

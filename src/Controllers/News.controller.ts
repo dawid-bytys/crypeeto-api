@@ -35,8 +35,6 @@ export const getNews = async (req: Request, res: Response) => {
 
     res.status(200).send(data);
   } catch (err) {
-    res
-      .status(401)
-      .send({ message: "3rd party server error, try again later" });
+    res.status(401).send({ message: err.toString() });
   }
 };

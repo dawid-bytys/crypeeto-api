@@ -15,7 +15,13 @@ export const authenticateToken = (
 
   // Try to verify the accessToken with the TOKEN_SECRET
   try {
-    jwt.verify(accessToken, process.env.JWT_TOKEN_SECRET || "");
+    const decodedToken = jwt.verify(
+      accessToken,
+      process.env.JWT_TOKEN_SECRET || ""
+    );
+
+    // Assign the token to the variable
+    req.user = decodedToken;
 
     // Continue doing the request
     next();
