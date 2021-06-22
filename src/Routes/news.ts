@@ -1,5 +1,5 @@
 import express from "express";
-import { getNews } from "../controllers/News.controller";
+import { getNews } from "../Controllers/News.controller";
 import { authenticateToken } from "../utils/auth";
 
 const newsRouter = express.Router();
