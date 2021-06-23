@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 // Authentication function for protected routes
@@ -15,13 +15,8 @@ export const authenticateToken = (
 
   // Try to verify the accessToken with the TOKEN_SECRET
   try {
-    const decodedToken = jwt.verify(
-      accessToken,
-      process.env.JWT_TOKEN_SECRET || ""
-    );
-
     // Assign the token to the variable
-    req.user = decodedToken;
+    req.user = jwt.verify(accessToken, process.env.JWT_TOKEN_SECRET || "");
 
     // Continue doing the request
     next();

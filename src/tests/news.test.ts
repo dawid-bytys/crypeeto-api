@@ -37,6 +37,9 @@ export const newsTests = () => {
       const response = await chai
         .request(app)
         .get("/news")
+        .query({
+          topic: "Bitcoin",
+        })
         .set("Authorization", `Bearer ${token}`);
 
       response.should.have.status(200);
@@ -44,7 +47,36 @@ export const newsTests = () => {
       response.body.should.have.keys("status", "totalResults", "articles");
     });
 
-    it("it should return access forbidden [403]", async () => {
+    it("it should return invalid data (no any data) [400]", async () => {
+      const token = await getToken(sampleUsername, samplePassword);
+
+      const response = await chai
+        .request(app)
+        .get("/news")
+        .set("Authorization", `Bearer ${token}`);
+
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have.property("message").eql("Invalid data");
+    });
+
+    it("it should return invalid data (no topic) [400]", async () => {
+      const token = await getToken(sampleUsername, samplePassword);
+
+      const response = await chai
+        .request(app)
+        .get("/news")
+        .query({
+          dupa: ";D",
+        })
+        .set("Authorization", `Bearer ${token}`);
+
+      response.should.have.status(400);
+      response.body.should.be.a("object");
+      response.body.should.have.property("message").eql("Invalid data");
+    });
+
+    it("it should return unauthorized [401]", async () => {
       const response = await chai
         .request(app)
         .get("/news")
@@ -54,5 +86,10 @@ export const newsTests = () => {
       response.body.should.be.a("object");
       response.body.should.have.property("message").eql("Unauthorized");
     });
+  });
+
+  // Clear the database after the tests
+  after(async () => {
+    const removal = await UserModel.deleteMany({});
   });
 };

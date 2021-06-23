@@ -23,13 +23,13 @@ export const register = async (req: Request, res: Response) => {
   if (!isPasswordValid(password))
     return res
       .status(400)
-      .send({ message: "You password doesn't match the requirements" });
+      .send({ message: "Your password doesn't match the requirements" });
 
   // Validate provided email
   if (!isEmailValid(email))
     return res
       .status(400)
-      .send({ message: "You e-mail doesn't match the requirements" });
+      .send({ message: "Your e-mail doesn't match the requirements" });
 
   // Check whether the email exists in the database
   const emailExists = await UserModel.findOne({ email: email });

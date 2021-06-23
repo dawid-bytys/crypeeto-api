@@ -47,7 +47,7 @@ export const userTests = () => {
       response.body.should.be.a("object");
       response.body.should.have
         .property("message")
-        .eql("Successfully registered!");
+        .eql("Successfully registered");
     });
 
     it("it should return username/email is in use [400]", async () => {
@@ -71,7 +71,7 @@ export const userTests = () => {
       response.body.should.have.property("message").eql("Invalid input");
     });
 
-    it("it should return email and password are invalid [400]", async () => {
+    it("it should return email or password are invalid [400]", async () => {
       const response = await chai.request(app).post("/register").send({
         username: generateUsername(),
         password: invalidPassword,
@@ -80,7 +80,12 @@ export const userTests = () => {
 
       response.should.have.status(400);
       response.body.should.be.a("object");
-      response.body.should.have.property("message").eql("Invalid input");
+      response.body.should.have
+        .property("message")
+        .eql(
+          "Your password doesn't match the requirements" ||
+            "Your e-mail doesn't match the requirements"
+        );
     });
 
     it("it should return invalid email [400]", async () => {
@@ -92,7 +97,9 @@ export const userTests = () => {
 
       response.should.have.status(400);
       response.body.should.be.a("object");
-      response.body.should.have.property("message").eql("Invalid input");
+      response.body.should.have
+        .property("message")
+        .eql("Your e-mail doesn't match the requirements");
     });
 
     it("it should return invalid password [400]", async () => {
@@ -104,7 +111,9 @@ export const userTests = () => {
 
       response.should.have.status(400);
       response.body.should.be.a("object");
-      response.body.should.have.property("message").eql("Invalid input");
+      response.body.should.have
+        .property("message")
+        .eql("Your password doesn't match the requirements");
     });
   });
 
@@ -204,5 +213,10 @@ export const userTests = () => {
       response.body.should.be.a("object");
       response.body.should.have.property("is_authorized").eql(false);
     });
+  });
+
+  // Clear the database after the tests
+  after(async () => {
+    const removal = await UserModel.deleteMany({});
   });
 };

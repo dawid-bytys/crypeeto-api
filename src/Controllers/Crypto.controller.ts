@@ -48,6 +48,10 @@ export const getPrices = async (req: Request, res: Response) => {
 export const getLatestPrice = async (req: Request, res: Response) => {
   const { symbol, exchange } = req.query;
 
+  // Check whether the user has provided valid data
+  if (Object.keys(req.query).length === 0 || !symbol || !exchange)
+    return res.status(400).send({ message: "Invalid data" });
+
   try {
     const { data } = await axios.get<CryptoPrice>(
       `https://api.twelvedata.com/price?symbol=${symbol}&exchange=${exchange}&apikey=${process.env.TWELVE_DATA_API_KEY}`
@@ -55,6 +59,6 @@ export const getLatestPrice = async (req: Request, res: Response) => {
 
     res.status(200).send(data);
   } catch (err) {
-    res.status(401).send({ message: err.toString() });
+    res.status(400).send({ message: err.toString() });
   }
 };
