@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import axios from "axios";
 
+// Types
 interface CryptoData {
   meta: {
     symbol: string;
@@ -28,6 +29,10 @@ interface CryptoPrice {
 export const getPrices = async (req: Request, res: Response) => {
   const { symbol, exchange, interval } = req.query;
 
+  // Check whether the user has provided valid data
+  if (Object.keys(req.query).length === 0 || !symbol || !exchange || !interval)
+    return res.status(400).send({ message: "Invalid data" });
+
   try {
     const { data } = await axios.get<CryptoData>(
       `https://api.twelvedata.com/time_series?symbol=${symbol}&exchange=${exchange}&interval=${interval}&apikey=${process.env.TWELVE_DATA_API_KEY}`
@@ -35,9 +40,7 @@ export const getPrices = async (req: Request, res: Response) => {
 
     res.status(200).send(data);
   } catch (err) {
-    res
-      .status(401)
-      .send({ message: "3rd party server error, try again later" });
+    res.status(401).send({ message: err.toString() });
   }
 };
 

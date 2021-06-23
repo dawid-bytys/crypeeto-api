@@ -1,5 +1,5 @@
 import axios from "axios";
-import { UserModel } from "../models/User.model";
+import { UserModel } from "../Models/User.model";
 import { getToken } from "../utils/utils";
 import chai from "chai";
 import chaiHttp from "chai-http";

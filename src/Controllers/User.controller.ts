@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import { UserModel } from "../Models/User.model";
 import { isPasswordValid, isEmailValid } from "../utils/utils";
 
+// Types
 interface User {
   username: string;
   email: string;
@@ -14,8 +15,8 @@ interface User {
 export const register = async (req: Request, res: Response) => {
   const { username, password, email }: User = req.body;
 
-  // Check whether the user has provided any data
-  if (Object.keys(req.body).length === 0)
+  // Check whether the user has provided valid data
+  if (Object.keys(req.body).length === 0 || !username || !password || !email)
     return res.status(400).send({ message: "Invalid input" });
 
   // Validate provided password
@@ -47,7 +48,7 @@ export const register = async (req: Request, res: Response) => {
   // Encrypt the provided password
   const encryptedPassword = bcrypt.hashSync(password, 16);
 
-  // Create the new User model
+  // Create a new User model
   const NewUser = new UserModel({
     username: username,
     email: email,
@@ -68,8 +69,8 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   const { username, password }: User = req.body;
 
-  // Check whether the user has provided any data
-  if (Object.keys(req.body).length === 0)
+  // Check whether the user has provided valid data
+  if (Object.keys(req.body).length === 0 || !username || !password)
     return res.status(400).send({ message: "Invalid input" });
 
   // Check whether the username exists in the database

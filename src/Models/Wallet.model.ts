@@ -2,8 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 interface Wallet {
   user_id: mongoose.Types.ObjectId;
-  currency: string;
-  abbreviation: string;
+  currency_id: mongoose.Types.ObjectId;
   amount: number;
 }
 
@@ -13,12 +12,9 @@ const WalletSchema = new Schema<Wallet>({
     ref: "User",
     required: true,
   },
-  currency: {
-    type: String,
-    required: true,
-  },
-  abbreviation: {
-    type: String,
+  currency_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Currency",
     required: true,
   },
   amount: {

@@ -7,7 +7,7 @@ dotenv.config({ path: path.join(__dirname + "/.env") });
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import router from "./routes/index";
+import router from "./Routes/index";
 import mongoose from "mongoose";
 
 const app = express();
