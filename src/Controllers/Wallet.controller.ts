@@ -67,9 +67,9 @@ export const updateWallet = async (req: Request, res: Response) => {
   if (Object.keys(bodyData).length === 0)
     return res.status(400).send({ message: "Invalid input" });
 
-  // Try to find a wallet which matches the user
-  const wallet = await WalletModel.findOne({ user_id: user._id });
-  if (!wallet)
+  // Try to find wallets which match the user
+  const wallets = await WalletModel.find({ user_id: user._id });
+  if (!wallets)
     return res.status(400).send({ message: "Couldn't find any wallet" });
 
   // Try to update the values

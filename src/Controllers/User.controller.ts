@@ -3,12 +3,24 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { UserModel } from "../Models/User.model";
 import { isPasswordValid, isEmailValid } from "../utils/utils";
+import { WalletModel } from "../Models/Wallet.model";
+import { CurrencyModel } from "../Models/Currency.model";
 
 // Types
 interface User {
   username: string;
   email: string;
   password: string;
+}
+
+interface CallbackData {
+  username: string;
+  email: string;
+  profile_img: string;
+  wallets: {
+    currency: string;
+    amount: number;
+  }[];
 }
 
 // Register function
@@ -90,11 +102,8 @@ export const login = async (req: Request, res: Response) => {
     { expiresIn: "6h" }
   );
 
-  // Send user their data
+  // Send user his accessToken
   res.status(200).send({
-    username: user.username,
-    email: user.email,
-    profile_img: user.profile_img,
     accessToken: accessToken,
   });
 };
@@ -135,4 +144,42 @@ export const authentication = async (req: Request, res: Response) => {
       is_authorized: false,
     });
   }
+};
+
+export const getUserData = async (req: Request, res: Response) => {
+  const user = req.user;
+
+  // Try to get user
+  const userData = await UserModel.findOne({
+    _id: user._id,
+  });
+
+  // Try to get user's wallets
+  const wallets = await WalletModel.find({
+    user_id: user._id,
+  });
+  if (!wallets)
+    return res.status(400).send({ message: "No wallets was found" });
+
+  // Try to get all matching currencies
+  const matchingCurrencies = await CurrencyModel.find({
+    _id: {
+      $in: wallets.map(x => x.currency_id),
+    },
+  });
+
+  // Create a structure of callback data
+  const callbackData: CallbackData = {
+    username: userData.username,
+    email: userData.email,
+    profile_img: userData.profile_img,
+    wallets: wallets.map(x => ({
+      currency: matchingCurrencies.find(
+        i => i._id.toString() === x.currency_id.toString()
+      ).currency,
+      amount: x.amount,
+    })),
+  };
+
+  res.status(200).send(callbackData);
 };

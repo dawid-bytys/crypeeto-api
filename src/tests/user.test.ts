@@ -127,12 +127,7 @@ export const userTests = () => {
 
       response.should.have.status(200);
       response.body.should.be.a("object");
-      response.body.should.have.keys(
-        "username",
-        "email",
-        "profile_img",
-        "accessToken"
-      );
+      response.body.should.have.property("accessToken");
     });
 
     it("it should return invalid username/password [400]", async () => {
@@ -212,6 +207,33 @@ export const userTests = () => {
       response.should.have.status(401);
       response.body.should.be.a("object");
       response.body.should.have.property("is_authorized").eql(false);
+    });
+  });
+
+  // Test the [GET] /user route
+  describe("[GET] /user", () => {
+    it("it should return user data [200]", async () => {
+      const token = await getToken(sampleUsername, samplePassword);
+
+      const response = await chai
+        .request(app)
+        .get("/user")
+        .set("Authorization", `Bearer ${token}`);
+
+      response.should.have.status(200);
+      response.body.should.be.a("object");
+      response.body.should.have.keys("username", "email", "email", "wallets");
+    });
+
+    it("it should return unauthorized [401]", async () => {
+      const response = await chai
+        .request(app)
+        .get("/user")
+        .set("Authorization", `Bearer 12345`);
+
+      response.should.have.status(401);
+      response.body.should.be.a("object");
+      response.body.should.have.property("message").eql("Unauthorized");
     });
   });
 
