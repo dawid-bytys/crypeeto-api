@@ -13,11 +13,8 @@ interface RegisterData extends LoginData {
 }
 
 interface Wallet {
-  currency: string;
   currency_from: string;
   currency_to: string;
-  currency_from_abbr: string;
-  currency_to_abbr: string;
   amount: number;
 }
 
@@ -50,13 +47,27 @@ export const isPasswordValid = (value: string): boolean => {
 
 // Wallet data validation
 export const isDataValid = (data: Wallet): boolean => {
-  return (
-    !data.currency_from ||
-    !data.currency_to ||
-    !data.currency_from_abbr ||
-    !data.currency_to_abbr ||
-    !data.amount
-  );
+  return !data.currency_from || !data.currency_to || !data.amount;
+};
+
+// Get abbreviation of a currency function
+export const getAbbreviation = (currency: string): string => {
+  switch (currency) {
+    case "Bitcoin":
+      return "BTC";
+    case "Ethereum":
+      return "ETH";
+    case "Ripple":
+      return "XRP";
+    case "Tether":
+      return "USDT";
+    case "Stellar":
+      return "XLM";
+    case "Uniswap":
+      return "UNI";
+    case "Cardano":
+      return "ADA";
+  }
 };
 
 // Get an accessToken
@@ -64,15 +75,13 @@ export const getToken = async (
   username: string,
   password: string
 ): Promise<string> => {
-  const { status, data } = await axios.post<{ accessToken: string }>(
-    "http://localhost:3001/login",
+  const { data } = await axios.post<{ accessToken: string }>(
+    "http://localhost:4000/login",
     {
       username: username,
       password: password,
     }
   );
-
-  if (status === 400) return "error";
 
   return data.accessToken;
 };

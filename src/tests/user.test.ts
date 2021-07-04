@@ -29,6 +29,9 @@ const registerCredentials = {
   email: sampleEmail,
 };
 
+// Token to perform the tests
+let token: string;
+
 export const userTests = () => {
   // Clear the database before the tests
   before(async () => {
@@ -175,7 +178,7 @@ export const userTests = () => {
   // Test the [GET] /authentication route
   describe("[GET] /authentication", () => {
     it("it should return authorization true", async () => {
-      const token = await getToken(sampleUsername, samplePassword);
+      token = await getToken(sampleUsername, samplePassword);
 
       const response = await chai
         .request(app)
@@ -213,8 +216,6 @@ export const userTests = () => {
   // Test the [GET] /user route
   describe("[GET] /user", () => {
     it("it should return user data [200]", async () => {
-      const token = await getToken(sampleUsername, samplePassword);
-
       const response = await chai
         .request(app)
         .get("/user")

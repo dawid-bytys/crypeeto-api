@@ -1,26 +1,21 @@
 import { Request, Response } from "express";
 import { WalletModel } from "../Models/Wallet.model";
 import { CurrencyModel } from "../Models/Currency.model";
-import { isDataValid, isPasswordValid } from "../utils/utils";
+import { isDataValid, getAbbreviation } from "../utils/utils";
 import axios from "axios";
 
 // Types
-interface ActualWallet {
+interface Wallet {
   currency: string;
   currency_from: string;
   currency_to: string;
-  currency_from_abbr: string;
-  currency_to_abbr: string;
   amount: number;
 }
 
-interface NewWallet {
-  currency: string;
-}
-
+// Create a new wallet
 export const createWallet = async (req: Request, res: Response) => {
   const user = req.user;
-  const { currency }: NewWallet = req.body;
+  const { currency }: Wallet = req.body;
 
   // Check whether the user has provided valid data
   if (Object.keys(req.body).length === 0 || !currency)
@@ -59,10 +54,11 @@ export const createWallet = async (req: Request, res: Response) => {
   }
 };
 
+// Update an existing wallet
 export const updateWallet = async (req: Request, res: Response) => {
   const user = req.user;
   const type = req.params.type;
-  const data: ActualWallet = req.body;
+  const data: Wallet = req.body;
 
   switch (type) {
     case "add":
@@ -154,7 +150,11 @@ export const updateWallet = async (req: Request, res: Response) => {
 
       try {
         const response = await axios.get(
-          `https://api.twelvedata.com/currency_conversion?symbol=${data.currency_from_abbr}/${data.currency_to_abbr}&amount=${data.amount}&apikey=${process.env.TWELVE_DATA_API_KEY}`
+          `https://api.twelvedata.com/currency_conversion?symbol=${getAbbreviation(
+            data.currency_from
+          )}/${getAbbreviation(data.currency_to)}&amount=${
+            data.amount
+          }&apikey=${process.env.TWELVE_DATA_API_KEY}`
         );
 
         await WalletModel.updateOne(

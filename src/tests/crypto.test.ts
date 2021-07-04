@@ -18,22 +18,24 @@ const sampleUsername = generateUsername();
 const samplePassword = generatePassword();
 const sampleEmail = generateEmail();
 
+// Token to perform the tests
+let token: string;
+
 export const cryptoTests = () => {
-  // Clear the database before the tests and login to get the accessToken
+  // Clear the database before the tests, register and login to get an accessToken
   before(async () => {
     const removal = await UserModel.deleteMany({});
-    const register = await axios.post("http://localhost:3001/register", {
+    const register = await axios.post("http://localhost:4000/register", {
       username: sampleUsername,
       password: samplePassword,
       email: sampleEmail,
     });
+    token = await getToken(sampleUsername, samplePassword);
   });
 
   // Test the [GET] /time_series route
   describe("[GET] /time_series", () => {
     it("it should return crypto latest prices [200]", async () => {
-      const token = await getToken(sampleUsername, samplePassword);
-
       const response = await chai
         .request(app)
         .get("/time_series")
@@ -50,8 +52,6 @@ export const cryptoTests = () => {
     });
 
     it("it should return invalid data (no any data) [400]", async () => {
-      const token = await getToken(sampleUsername, samplePassword);
-
       const response = await chai
         .request(app)
         .get("/time_series")
@@ -63,8 +63,6 @@ export const cryptoTests = () => {
     });
 
     it("it should return invalid data (no symbol) [400]", async () => {
-      const token = await getToken(sampleUsername, samplePassword);
-
       const response = await chai
         .request(app)
         .get("/time_series")
@@ -94,8 +92,6 @@ export const cryptoTests = () => {
   // [GET] /price
   describe("[GET] /price", () => {
     it("it should return converted price [200]", async () => {
-      const token = await getToken(sampleUsername, samplePassword);
-
       const response = await chai
         .request(app)
         .get("/price")

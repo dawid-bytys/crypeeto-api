@@ -5,18 +5,16 @@ import path from "path";
 dotenv.config({ path: path.join(__dirname + "/.env") });
 
 import express from "express";
-import cookieParser from "cookie-parser";
 import cors from "cors";
 import router from "./Routes/index";
 import mongoose from "mongoose";
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 4000;
 
 // Server configuration
 app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
-app.use(cookieParser());
 app.use(router);
 
 // Try to connect to the database
