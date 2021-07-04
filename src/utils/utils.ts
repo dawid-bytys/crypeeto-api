@@ -12,6 +12,15 @@ interface RegisterData extends LoginData {
   email: string | undefined;
 }
 
+interface Wallet {
+  currency: string;
+  currency_from: string;
+  currency_to: string;
+  currency_from_abbr: string;
+  currency_to_abbr: string;
+  amount: number;
+}
+
 // Function which generates random username
 export const generateUsername = (): string => {
   return crypto.randomBytes(10).toString("hex");
@@ -37,6 +46,17 @@ export const isEmailValid = (value: string): boolean => {
 export const isPasswordValid = (value: string): boolean => {
   const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
   return passwordPattern.test(value);
+};
+
+// Wallet data validation
+export const isDataValid = (data: Wallet): boolean => {
+  return (
+    !data.currency_from ||
+    !data.currency_to ||
+    !data.currency_from_abbr ||
+    !data.currency_to_abbr ||
+    !data.amount
+  );
 };
 
 // Get an accessToken

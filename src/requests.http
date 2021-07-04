@@ -1,0 +1,12 @@
+###
+POST http://localhost:3001/wallet/update/exchange
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGUxMTg5ZGJlZDBkNzA0ZWMyMWE0MmQiLCJpYXQiOjE2MjUzNjUwMjAsImV4cCI6MTYyNTM4NjYyMH0.2BXJyA-RFjpp0YryFj1S1hEcpI4arpz9WIIiF0TeK8s
+
+{
+  "currency_from": "Bitcoin",
+  "currency_to": "Ethereum",
+  "currency_from_abbr": "BTC",
+  "currency_to_abbr": "ETH",
+  "amount": 10
+}
