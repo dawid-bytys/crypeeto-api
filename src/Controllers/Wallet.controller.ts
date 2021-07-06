@@ -5,24 +5,37 @@ import { isDataValid, getAbbreviation } from "../utils/utils";
 import axios from "axios";
 
 // Types
-interface Wallet {
+interface WalletAdd {
   currency: string;
+  amount: number;
+}
+
+interface WalletExchange {
   currency_from: string;
   currency_to: string;
   amount: number;
 }
 
+interface Exchange {
+  symbol: string;
+  rate: number;
+  amount: number;
+  timestamp: number;
+}
+
 // Create a new wallet
 export const createWallet = async (req: Request, res: Response) => {
   const user = req.user;
-  const { currency }: Wallet = req.body;
+  const { currency }: { currency: string } = req.body;
 
   // Check whether the user has provided valid data
   if (Object.keys(req.body).length === 0 || !currency)
     return res.status(400).send({ message: "Invalid input" });
 
   // Find cryptocurrency with provided type
-  const specificCurrency = await CurrencyModel.findOne({ currency: currency });
+  const specificCurrency = await CurrencyModel.findOne({
+    currency: currency,
+  });
   if (!specificCurrency)
     return res.status(400).send({ message: "Invalid input" });
 
@@ -50,7 +63,7 @@ export const createWallet = async (req: Request, res: Response) => {
       .status(200)
       .send({ message: "Your wallet has been successfully created" });
   } catch (err) {
-    res.status(400).send({ message: err.toString() });
+    res.status(err.statusCode).send({ message: err.toString() });
   }
 };
 
@@ -58,17 +71,18 @@ export const createWallet = async (req: Request, res: Response) => {
 export const updateWallet = async (req: Request, res: Response) => {
   const user = req.user;
   const type = req.params.type;
-  const data: Wallet = req.body;
 
   switch (type) {
     case "add":
+      const addData: WalletAdd = req.body;
+
       // Check whether the user has provided any data
-      if (Object.keys(data).length === 0 || !data.currency)
+      if (Object.keys(addData).length === 0 || !addData.currency)
         return res.status(400).send({ message: "Invalid input" });
 
       // Find cryptocurrency with provided type
       const specificCurrency = await CurrencyModel.findOne({
-        currency: data.currency,
+        currency: addData.currency,
       });
       if (!specificCurrency)
         return res.status(400).send({ message: "Invalid currency" });
@@ -91,7 +105,7 @@ export const updateWallet = async (req: Request, res: Response) => {
           },
           {
             $inc: {
-              amount: data.amount,
+              amount: addData.amount,
             },
           }
         );
@@ -100,24 +114,26 @@ export const updateWallet = async (req: Request, res: Response) => {
           .status(200)
           .send({ message: "Your wallet has been successfully updated" });
       } catch (err) {
-        res.status(400).send({ message: err.toString() });
+        res.status(err.statusCode).send({ message: err.toString() });
       }
       break;
     case "exchange":
+      const exchangeData: WalletExchange = req.body;
+
       // Check whether the user has provided any data
-      if (Object.keys(data).length === 0 || isDataValid(data))
+      if (Object.keys(exchangeData).length === 0 || isDataValid(exchangeData))
         return res.status(400).send({ message: "Invalid input" });
 
       // Find cryptocurrency with provided type
       const currencyFrom = await CurrencyModel.findOne({
-        currency: data.currency_from,
+        currency: exchangeData.currency_from,
       });
       if (!currencyFrom)
         return res.status(400).send({ message: "Invalid currency" });
 
       // Find cryptocurrency with provided type
       const currencyTo = await CurrencyModel.findOne({
-        currency: data.currency_to,
+        currency: exchangeData.currency_to,
       });
       if (!currencyTo)
         return res.status(400).send({ message: "Invalid currency" });
@@ -143,17 +159,17 @@ export const updateWallet = async (req: Request, res: Response) => {
         });
 
       // Check whether the user has enough amount of money available
-      if (walletFrom.amount < data.amount)
+      if (walletFrom.amount < exchangeData.amount)
         return res
           .status(400)
           .send({ message: "Insufficient funds in your account" });
 
       try {
-        const response = await axios.get(
+        const { data } = await axios.get<Exchange>(
           `https://api.twelvedata.com/currency_conversion?symbol=${getAbbreviation(
-            data.currency_from
-          )}/${getAbbreviation(data.currency_to)}&amount=${
-            data.amount
+            exchangeData.currency_from
+          )}/${getAbbreviation(exchangeData.currency_to)}&amount=${
+            exchangeData.amount
           }&apikey=${process.env.TWELVE_DATA_API_KEY}`
         );
 
@@ -164,7 +180,7 @@ export const updateWallet = async (req: Request, res: Response) => {
           },
           {
             $inc: {
-              amount: -data.amount,
+              amount: -exchangeData.amount,
             },
           }
         );
@@ -176,7 +192,7 @@ export const updateWallet = async (req: Request, res: Response) => {
           },
           {
             $inc: {
-              amount: response.data.amount,
+              amount: data.amount,
             },
           }
         );
@@ -185,7 +201,7 @@ export const updateWallet = async (req: Request, res: Response) => {
           .status(200)
           .send({ message: "Your wallet has been successfully updated" });
       } catch (err) {
-        res.status(400).send({ message: err.toString() });
+        res.status(err.statusCode).send({ message: err.toString() });
       }
       break;
     default:

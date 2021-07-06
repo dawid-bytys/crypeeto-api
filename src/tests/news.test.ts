@@ -18,22 +18,24 @@ const sampleUsername = generateUsername();
 const samplePassword = generatePassword();
 const sampleEmail = generateEmail();
 
+// Token to perform the tests
+let token: string;
+
 export const newsTests = () => {
   // Clear the database before the tests and login to get the accessToken
   before(async () => {
     const removal = await UserModel.deleteMany({});
-    const register = await axios.post("http://localhost:3001/register", {
+    const register = await axios.post("http://localhost:4000/register", {
       username: sampleUsername,
       password: samplePassword,
       email: sampleEmail,
     });
+    token = await getToken(sampleUsername, samplePassword);
   });
 
   // Test the [GET] /news route
   describe("[GET] /news", () => {
     it("it should return news data [200]", async () => {
-      const token = await getToken(sampleUsername, samplePassword);
-
       const response = await chai
         .request(app)
         .get("/news")
@@ -48,8 +50,6 @@ export const newsTests = () => {
     });
 
     it("it should return invalid data (no any data) [400]", async () => {
-      const token = await getToken(sampleUsername, samplePassword);
-
       const response = await chai
         .request(app)
         .get("/news")
@@ -61,8 +61,6 @@ export const newsTests = () => {
     });
 
     it("it should return invalid data (no topic) [400]", async () => {
-      const token = await getToken(sampleUsername, samplePassword);
-
       const response = await chai
         .request(app)
         .get("/news")

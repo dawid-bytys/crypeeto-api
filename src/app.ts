@@ -10,7 +10,7 @@ import router from "./Routes/index";
 import mongoose from "mongoose";
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT;
 
 // Server configuration
 app.use(express.json());
@@ -19,7 +19,7 @@ app.use(router);
 
 // Try to connect to the database
 try {
-  mongoose.connect(process.env.MONGO_DATABASE_URI || "", {
+  mongoose.connect(process.env.MONGO_DATABASE_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });

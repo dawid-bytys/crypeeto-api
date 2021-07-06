@@ -130,7 +130,7 @@ export const userTests = () => {
 
       response.should.have.status(200);
       response.body.should.be.a("object");
-      response.body.should.have.property("accessToken");
+      response.body.should.have.property("access_token");
     });
 
     it("it should return invalid username/password [400]", async () => {
@@ -177,7 +177,7 @@ export const userTests = () => {
 
   // Test the [GET] /authentication route
   describe("[GET] /authentication", () => {
-    it("it should return authorization true", async () => {
+    it("it should return authorization true [200]", async () => {
       token = await getToken(sampleUsername, samplePassword);
 
       const response = await chai

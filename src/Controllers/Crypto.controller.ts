@@ -40,7 +40,7 @@ export const getPrices = async (req: Request, res: Response) => {
 
     res.status(200).send(data);
   } catch (err) {
-    res.status(401).send({ message: err.toString() });
+    res.status(err.statusCode).send({ message: err.toString() });
   }
 };
 
@@ -59,6 +59,6 @@ export const getLatestPrice = async (req: Request, res: Response) => {
 
     res.status(200).send(data);
   } catch (err) {
-    res.status(400).send({ message: err.toString() });
+    res.status(err.statusCode).send({ message: err.toString() });
   }
 };

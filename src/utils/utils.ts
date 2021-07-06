@@ -2,16 +2,7 @@ import crypto from "crypto";
 import RandExp from "randexp";
 import axios from "axios";
 
-// Types
-interface LoginData {
-  username: string | undefined;
-  password: string | undefined;
-}
-
-interface RegisterData extends LoginData {
-  email: string | undefined;
-}
-
+//Types
 interface Wallet {
   currency_from: string;
   currency_to: string;
@@ -36,13 +27,13 @@ export const generateEmail = (): string => {
 // E-amil validation function
 export const isEmailValid = (value: string): boolean => {
   const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-  return emailPattern.test(value);
+  return !emailPattern.test(value);
 };
 
 // Password validation function
 export const isPasswordValid = (value: string): boolean => {
   const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
-  return passwordPattern.test(value);
+  return !passwordPattern.test(value);
 };
 
 // Wallet data validation
@@ -75,7 +66,7 @@ export const getToken = async (
   username: string,
   password: string
 ): Promise<string> => {
-  const { data } = await axios.post<{ accessToken: string }>(
+  const { data } = await axios.post<{ access_token: string }>(
     "http://localhost:4000/login",
     {
       username: username,
@@ -83,5 +74,5 @@ export const getToken = async (
     }
   );
 
-  return data.accessToken;
+  return data.access_token;
 };

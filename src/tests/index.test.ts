@@ -4,7 +4,7 @@ import { cryptoTests } from "./crypto.test";
 import { walletTests } from "./wallet.test";
 
 // Combine all tests
-/*describe("#USER CONTROLLER", () => {
+describe("#USER CONTROLLER", () => {
   userTests();
 });
 
@@ -14,7 +14,7 @@ describe("#NEWS CONTROLLER", () => {
 
 describe("#CRYPTO CONTROLLER", () => {
   cryptoTests();
-});*/
+});
 
 describe("#WALLET CONTROLLER", () => {
   walletTests();

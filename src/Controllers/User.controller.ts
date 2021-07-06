@@ -9,8 +9,8 @@ import { CurrencyModel } from "../Models/Currency.model";
 // Types
 interface User {
   username: string;
-  email: string;
   password: string;
+  email: string;
 }
 
 interface CallbackData {
@@ -32,13 +32,13 @@ export const register = async (req: Request, res: Response) => {
     return res.status(400).send({ message: "Invalid input" });
 
   // Validate provided password
-  if (!isPasswordValid(password))
+  if (isPasswordValid(password))
     return res
       .status(400)
       .send({ message: "Your password doesn't match the requirements" });
 
   // Validate provided email
-  if (!isEmailValid(email))
+  if (isEmailValid(email))
     return res
       .status(400)
       .send({ message: "Your e-mail doesn't match the requirements" });
@@ -73,13 +73,13 @@ export const register = async (req: Request, res: Response) => {
 
     res.status(200).send({ message: "Successfully registered" });
   } catch (err) {
-    res.status(400).send({ message: err.toString() });
+    res.status(err.statusCode).send({ message: err.toString() });
   }
 };
 
 // Login function
 export const login = async (req: Request, res: Response) => {
-  const { username, password }: User = req.body;
+  const { username, password }: Omit<User, "email"> = req.body;
 
   // Check whether the user has provided valid data
   if (Object.keys(req.body).length === 0 || !username || !password)
@@ -91,20 +91,20 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).send({ message: "Invalid username or password" }); // Prevent from easier bruteforcing
 
   // Check whether the provided password match password in the databse
-  const passwordValid = await bcrypt.compare(password, user.password);
-  if (!passwordValid)
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid)
     return res.status(400).send({ message: "Invalid username or password" }); // Prevent from easier bruteforcing
 
   // Generate the accessToken
   const accessToken = jwt.sign(
     { _id: user._id },
-    process.env.JWT_TOKEN_SECRET || "",
+    process.env.JWT_TOKEN_SECRET,
     { expiresIn: "6h" }
   );
 
   // Send user his accessToken
   res.status(200).send({
-    accessToken: accessToken,
+    access_token: accessToken,
   });
 };
 
@@ -123,12 +123,12 @@ export const authentication = async (req: Request, res: Response) => {
     // Decode the token
     const decodedToken = jwt.verify(
       accessToken,
-      process.env.JWT_TOKEN_SECRET || ""
-    );
+      process.env.JWT_TOKEN_SECRET
+    ) as any;
 
     // Check whether the token has already expired
     const user = await UserModel.findOne({
-      _id: (decodedToken as any)._id,
+      _id: decodedToken._id,
     });
     if (!user)
       return res.status(401).send({
