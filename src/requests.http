@@ -1,4 +1,0 @@
-###
-GET http://localhost:4000/authentication
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGU0OWUwNTdjY2Q3YzBmNjQ4MGZhYzciLCJpYXQiOjE2MjU1OTU0MDgsImV4cCI6MTYyNTYxNzAwOH0.KTV9qjTg3431eHkqM_LXhsiTGAmgsKZ1hNIRYBrCAU0
