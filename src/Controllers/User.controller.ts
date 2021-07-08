@@ -43,16 +43,10 @@ export const register = async (req: Request, res: Response) => {
       .status(400)
       .send({ message: "Your e-mail doesn't match the requirements" });
 
-  // Check whether the email exists in the database
+  // Check whether the email or the username exists in the database
   const emailExists = await UserModel.findOne({ email: email });
-  if (emailExists)
-    return res
-      .status(400)
-      .send({ message: "Username or E-mail is already in use" }); // Prevent from easier bruteforcing
-
-  // Check whether the username exists in the database
   const usernameExists = await UserModel.findOne({ username: username });
-  if (usernameExists)
+  if (emailExists || usernameExists)
     return res
       .status(400)
       .send({ message: "Username or E-mail is already in use" }); // Prevent from easier bruteforcing
@@ -90,9 +84,9 @@ export const login = async (req: Request, res: Response) => {
   if (!user)
     return res.status(400).send({ message: "Invalid username or password" }); // Prevent from easier bruteforcing
 
-  // Check whether the provided password match password in the databse
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid)
+  // Check whether the provided password matches the password in the database
+  const passwordValid = await bcrypt.compare(password, user.password);
+  if (!passwordValid)
     return res.status(400).send({ message: "Invalid username or password" }); // Prevent from easier bruteforcing
 
   // Generate the accessToken
